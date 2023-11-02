@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int exp;
+    int co;
+    struct Node* next;
+};
+
+struct Node* createNode(int co, int exp) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->co = co;
+    newNode->exp = exp;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insertNode(struct Node** head, int co, int exp) {
+    struct Node* temp = *head;
+    if (temp == NULL) {
+        *head = createNode(co, exp);
+        return;
+    }
+
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    temp->next = createNode(co, exp);
+}
+
+void display(struct Node* poly) {
+    struct Node* temp = poly;
+    int count = 0;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    printf("%d ", count);
+    
+    temp = poly;
+    while (temp != NULL) {
+        printf("%d %d ", temp->exp, temp->co);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+struct Node* addPolynomials(struct Node* poly1, struct Node* poly2) {
+    struct Node* result = NULL;
+
+    while (poly1 != NULL || poly2 != NULL) {
+        if (poly1 == NULL) {
+            insertNode(&result, poly2->co, poly2->exp);
+            poly2 = poly2->next;
+        } else if (poly2 == NULL) {
+            insertNode(&result, poly1->co, poly1->exp);
+            poly1 = poly1->next;
+        } else {
+            if (poly1->exp == poly2->exp) {
+                insertNode(&result, poly1->co + poly2->co, poly1->exp);
+                poly1 = poly1->next;
+                poly2 = poly2->next;
+            } else if (poly1->exp > poly2->exp) {
+                insertNode(&result, poly1->co, poly1->exp);
+                poly1 = poly1->next;
+            } else {
+                insertNode(&result, poly2->co, poly2->exp);
+                poly2 = poly2->next;
+            }
+        }
+    }
+    return result;
+}
+
+int main() {
+    struct Node* poly1 = NULL;
+    struct Node* poly2 = NULL;
+    int choice;
+    int exp, co;
+    
+    while (1) {
+        printf("Menu:\n");
+        printf("1: Enter 1st polynomial\n");
+        printf("2: Enter 2nd polynomial\n");
+        printf("3: Add polynomials\n");
+        printf("4: Display the result\n");
+        printf("5: Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the number of elements of polynomial 1: ");
+                int m;
+                scanf("%d", &m);
+                printf("Enter the exponents and coefficients of polynomial 1:\n");
+                for (int i = 0; i < m; ++i) {
+                    scanf("%d%d", &exp, &co);
+                    insertNode(&poly1, co, exp);
+                }
+                break;
+
+            case 2:
+                printf("Enter the number of elements of polynomial 2: ");
+                int n;
+                scanf("%d", &n);
+                printf("Enter the exponents and coefficients of polynomial 2:\n");
+                for (int i = 0; i < n; ++i) {
+                    scanf("%d%d", &exp, &co);
+                    insertNode(&poly2, co, exp);
+                }
+                break;
+
+            case 3:
+                struct Node* sum = addPolynomials(poly1, poly2);
+                display(sum);
+                break;
+
+            case 4:
+                printf("1st Polynomial: ");
+                display(poly1);
+                printf("2nd Polynomial: ");
+                display(poly2);
+                break;
+
+            case 5:
+                return 0;
+
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    }
+    return 0;
+}
